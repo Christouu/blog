@@ -1,10 +1,11 @@
 $lightgreen: #b9e7e7;
+$darkgreen: #4c6363;
 
 .app {
     display: flex;
     justify-content: center;
     .container {
-        width: 1024px;
+        width: 1424px;
 
         .link {
             text-decoration: none;
@@ -126,6 +127,82 @@ $lightgreen: #b9e7e7;
             img {
                 height: 50px;
 
+            }
+        }
+
+        //Home page
+
+        .home {
+            .posts {
+                margin-top: 50px;
+                display: flex;
+                flex-direction: column;
+                gap: 150px;
+
+                .post {
+                    display: flex;
+                    gap: 100px;
+
+                    //2n+1 => if its an odd number child
+                    &:nth-child(2n+1) {
+                        flex-direction: row-reverse;
+                    }
+
+                    .img {
+                        flex: 2;
+                        position: relative;
+
+                        // lighgreen backgrounds behind images of posts
+                        &::after {
+                            content: '';
+                            width: 100%;
+                            height: 100%;
+                            background-color: $lightgreen;
+                            position: absolute;
+                            top: 20px;
+                            left: -20px;
+                            z-index: -1;
+                        }
+
+                        img {
+                            width: 100%;
+                            max-height: 400px;
+                            object-fit: cover;
+                        }
+                    }
+
+                    .content {
+                        flex: 3;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+
+                        h1 {
+                            font-size: 48px;
+                        }
+
+                        p {
+                            font-size: 24px;
+                        }
+
+                        button {
+                            width: max-content;
+                            padding: 10px 20px;
+                            border: none;
+                            cursor: pointer;
+                            background-color: white;
+                            border: 1px solid $lightgreen;
+                            color: teal;
+                            transition: 0.5s all ease;
+
+                            &:hover {
+                                background-color: $darkgreen;
+                                border: 1px solid white;
+                                color: white;
+                            }
+                        }
+                    }
+                }
             }
         }
 
