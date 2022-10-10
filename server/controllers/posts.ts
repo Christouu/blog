@@ -1,6 +1,6 @@
 import { db } from "../db";
 import jwt from "jsonwebtoken";
-import { Response, Request } from "express";
+import { Response, Request, query } from "express";
 
 export const getPosts = (req: Request, res: Response) => {
   const query = req.query.category
@@ -26,7 +26,32 @@ export const getPost = (req: Request, res: Response) => {
 };
 
 export const addPost = (req: Request, res: Response) => {
-  res.json("from controller");
+  const token = req.cookies.access_token;
+  //check if there is a token
+  if (!token) return res.status(401).json("You are not authenticated");
+
+  //check if token is valid
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const query =
+      "INSERT INTO posts(`title`, `description`, `image`, `category`, `date`, `uid`) VALUES (?)";
+
+    const values = [
+      req.body.title,
+      req.body.description,
+      req.body.image,
+      req.body.category,
+      req.body.date,
+      userInfo.id,
+    ];
+
+    db.query(query, [values], (err, data) => {
+      if (err) return res.status(500).send(err);
+
+      return res.json("Post has been created");
+    });
+  });
 };
 
 export const deletePost = (req: Request, res: Response) => {
@@ -34,7 +59,7 @@ export const deletePost = (req: Request, res: Response) => {
   //check if there is a token
   if (!token) return res.status(401).json("You are not authenticated");
 
-  //chech if token is valid
+  //check if token is valid
   jwt.verify(token, "jwtkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
 
@@ -51,5 +76,30 @@ export const deletePost = (req: Request, res: Response) => {
 };
 
 export const updatePost = (req: Request, res: Response) => {
-  res.json("from controller");
+  const token = req.cookies.access_token;
+  //check if there is a token
+  if (!token) return res.status(401).json("You are not authenticated");
+
+  //check if token is valid
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const postId = req.params.id;
+
+    const query =
+      "UPDATE posts SET `title`=?, `description`=?, `image`=?, `category`=? WHERE `id`= ? AND `uid` = ? ";
+
+    const values = [
+      req.body.title,
+      req.body.description,
+      req.body.image,
+      req.body.category,
+    ];
+
+    db.query(query, [...values, postId, userInfo.id], (err, data) => {
+      if (err) return res.status(500).send(err);
+
+      return res.json("Post has been updated");
+    });
+  });
 };

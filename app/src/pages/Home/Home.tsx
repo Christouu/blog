@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { getText } from "../../helpers/getText";
 import { IPost } from "../../interfaces/post";
 
 const Home = () => {
@@ -41,7 +42,7 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`/posts${category}`);
-        console.log(response.data);
+
         setPosts(response.data);
       } catch (error) {
         console.log(error);
@@ -57,13 +58,13 @@ const Home = () => {
         {posts.map((p: IPost) => (
           <div className="post" key={p.id}>
             <div className="img">
-              <img src={p.image} alt="" />
+              <img src={`./upload/${p.image}`} alt="" />
             </div>
             <div className="content">
               <Link className="link" to={`/post/${p.id}`}>
                 <h1>{p.title}</h1>
               </Link>
-              <p>{p.description}</p>
+              <p>{getText(p.description)}</p>
               <Link to={`/post/${p.id}`}>
                 <button>Read More...</button>
               </Link>

@@ -8,6 +8,7 @@ import Delete from "../../img/delete.png";
 import Menu from "../../components/Menu/Menu";
 import { IPost } from "../../interfaces/post";
 import { AuthContext } from "../../context/authContext";
+import { getText } from "../../helpers/getText";
 
 const Single = () => {
   const [post, setPost] = useState<IPost>({
@@ -52,7 +53,7 @@ const Single = () => {
   return (
     <div className="single">
       <div className="content">
-        <img src={post?.image} alt="some image" />
+        <img src={`../upload/${post?.image}`} alt="some image" />
         <div className="user">
           {post?.userImg && <img src={post.userImg} alt="profile picture" />}
           <div className="userInfo">
@@ -61,7 +62,7 @@ const Single = () => {
           </div>
           {currentUser.username === post?.username && (
             <div className="edit">
-              <Link to={`/write?edit=2`}>
+              <Link to={`/write?edit=${post.id}`} state={post}>
                 <img src={Edit} alt="edit image" />
               </Link>
               <img onClick={handleDelete} src={Delete} alt="delete image" />
@@ -70,9 +71,9 @@ const Single = () => {
         </div>
 
         <h1>{post.title}</h1>
-        <p className="description">{post.description}</p>
+        <p className="description">{getText(post.description)}</p>
       </div>
-      <Menu />
+      <Menu category={post.category} />
     </div>
   );
 };
