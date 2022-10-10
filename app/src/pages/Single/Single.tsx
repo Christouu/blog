@@ -1,47 +1,76 @@
+import axios from "axios";
+import moment from "moment";
+import { useContext, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import Edit from "../../img/edit.png";
 import Delete from "../../img/delete.png";
-import { Link } from "react-router-dom";
 import Menu from "../../components/Menu/Menu";
+import { IPost } from "../../interfaces/post";
+import { AuthContext } from "../../context/authContext";
 
 const Single = () => {
+  const [post, setPost] = useState<IPost>({
+    id: 0,
+    title: "",
+    description: "",
+    image: "",
+    category: "",
+  });
+
+  //get the category from url
+  const category = useLocation();
+  const postId = category.pathname.split("/")[2];
+  const navigate = useNavigate();
+
+  const { currentUser } = useContext(AuthContext);
+
+  //fetch data based ot category from url
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get<IPost>(`/posts/${postId}`);
+
+        setPost(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, [postId]);
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`/posts/${postId}`);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="single">
       <div className="content">
-        <img
-          src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Viktor_0.jpg"
-          alt="some image"
-        />
+        <img src={post?.image} alt="some image" />
         <div className="user">
-          <img
-            src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Viktor_0.jpg"
-            alt="profile picture"
-          />
+          {post?.userImg && <img src={post.userImg} alt="profile picture" />}
           <div className="userInfo">
-            <span className="name">Kristou</span>
-            <p className="posted">posted 2 days ago</p>
+            <span className="name">{post?.username}</span>
+            <p className="posted">posted {moment(post.date).fromNow()}</p>
           </div>
-          <div className="edit">
-            <Link to={`/write?edit=2`}>
-              <img src={Edit} alt="edit image" />
-            </Link>
-            <img src={Delete} alt="delete image" />
-          </div>
+          {currentUser.username === post?.username && (
+            <div className="edit">
+              <Link to={`/write?edit=2`}>
+                <img src={Edit} alt="edit image" />
+              </Link>
+              <img onClick={handleDelete} src={Delete} alt="delete image" />
+            </div>
+          )}
         </div>
 
-        <h1>TITLE</h1>
-        <p className="description">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Porro
-          adipisci vel sunt ex harum, dolorum rem, nulla vitae libero ratione
-          quaerat nobis quas impedit minus repudiandae quisquam expedita. Libero
-          non laboriosam ducimus iusto eligendi! Quas dolor laboriosam quo iure
-          sunt, aspernatur, aliquam tenetur qui porro magnam recusandae
-          accusamus fuga iste? Nobis incidunt numquam, iusto labore animi hic
-          quasi necessitatibus illum temporibus corrupti provident magni optio
-          autem vel laudantium fuga odit officiis sequi sit rerum rem tenetur.
-          Consequatur eius praesentium incidunt ratione, suscipit voluptate
-          esse, perspiciatis sequi deleniti aperiam adipisci dicta, nihil nulla
-          voluptatem. Id labore neque ipsa corrupti recusandae accusantium!
-        </p>
+        <h1>{post.title}</h1>
+        <p className="description">{post.description}</p>
       </div>
       <Menu />
     </div>
